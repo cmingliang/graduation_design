@@ -1,0 +1,16 @@
+1.jdk1.8安装和配置;
+2.mysql5.7安装;
+3.maven本地安装配置,私服地址:
+    <mirror>
+      <id>nexus</id>
+      <mirrorOf>*</mirrorOf>
+      <url>http://192.168.100.165:8081/repository/maven-public/</url>
+    </mirror>
+4.开发工具:后端-sts,前端-WebStorm;
+5.版本控制工具:svn;
+6.node.js
+======================================================================
+技术栈:
+后端:java1.8,spring boot,spring data jpa等;
+前端:html/js/css,vue.js,element-ui;
+    
