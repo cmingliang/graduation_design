@@ -1,5 +1,6 @@
 <template>
   <el-scrollbar wrap-class="scrollbar-wrapper">
+    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
     <el-menu
       :show-timeout="200"
       :default-active="$route.path"
@@ -14,9 +15,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import SidebarItem from './SidebarItem'
+import Hamburger from '@/components/Hamburger'
 
 export default {
-  components: { SidebarItem },
+  components: { SidebarItem,Hamburger },
   computed: {
     ...mapGetters([
       'permission_routers',
@@ -33,7 +35,19 @@ export default {
     //     return item.meta.navShow ==null || item.meta.navShow != false;
     //   });
     // }
+  },
+  methods:{
+    toggleSideBar() {
+      this.$store.dispatch('toggleSideBar')
+    }
   }
 }
 </script>
+
+<style scoped>
+  .hamburger-container {
+    margin-left: 20px;
+  }
+</style>
+
 
