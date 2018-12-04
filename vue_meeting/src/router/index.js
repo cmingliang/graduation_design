@@ -98,6 +98,13 @@ export const constantRouterMap = [
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
         meta: {  name: '工作台',title: 'dashboard', icon: 'dashboard', noCache: true }
+      },
+      {        
+        path: 'booking',
+        component: () => import('@/views/booking/index'),
+        hidden:true,
+        name:'Booking',
+        meta: {  name: '预约信息填写',title: 'booking', icon: 'user', noCache: true },      
       }
     ]
   },

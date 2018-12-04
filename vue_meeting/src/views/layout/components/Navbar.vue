@@ -13,16 +13,49 @@
         <!--</el-tooltip>-->
         <!--<lang-select class="international right-menu-item"/>-->
       </template>
-
-      <el-dropdown class="avatar-container right-menu-item" trigger="click">
-        <div class="message-wrapper"><i class="el-icon-bell"/></div>
-        
+       
+      <el-dropdown class="avatar-container right-menu-item" trigger="click">           
         <div class="avatar-wrapper">
          <!--<span class="svg-container ">-->
           <!--<svg-icon icon-class="user" />-->
         <!--</span>-->
           <!--<img src="@/assets/head1.jpg" class="user-avatar">-->
+          <div class="message-wrapper">
+          <el-dropdown class="message-down">
+          <el-badge :value="messageNumber" class="item">
+            <i class="el-icon-bell"/>
+          </el-badge>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>
+              <div class="message-card" style="display:flex;justify-content:space-between">
+               会议信息 <span style="color:#777777;font-size:12px">忽略全部</span>
+              </div>
+            </el-dropdown-item>
+            <el-dropdown-item divided>
+              <div class="message-card">
+                <p>张三邀请你参加会议：市场部会议</p>
+                <p>会议时间：2018-12-3 15：00-16：00</p>
+                <p>会议地点：第一会议室</p>
+                <p>请确认是否参加</p> 
+                <el-button type="primary" class="message-btn" style="background-color: #3cafcc;">参加</el-button>
+                <el-button type="primary" class="message-btn" style="background-color: #f5856d;">请假</el-button>
+              </div>
+            </el-dropdown-item>
+             <el-dropdown-item divided>
+              <div class="message-card">
+                <p>张三邀请你参加会议：市场部会议</p>
+                <p>会议时间：2018-12-3 15：00-16：00</p>
+                <p>会议地点：第一会议室</p>
+                <p>请确认是否参加</p> 
+                <el-button type="primary" class="message-btn" style="background-color: #3cafcc;">参加</el-button>
+                <el-button type="primary" class="message-btn" style="background-color: #f5856d;">请假</el-button>
+              </div>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+          </el-dropdown>
+          </div>  
           <img class="user-avatar" src="@/assets/bear.jpg" alt="bear">
+                 
           <span class="user-name" style="color: #fff">
             {{userInfo.name}}
           </span>
@@ -68,6 +101,11 @@ export default {
     Screenfull,
     LangSelect
   },
+  data() {
+    return {
+      messageNumber:2
+    }
+  },
   computed: {
     ...mapGetters([
       'userInfo',
@@ -91,12 +129,35 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+  .message-btn {
+    width: 80px;
+    height: 28px;
+    border: 0;
+    padding: 0 0;
+    margin-top: 15px;  
+    margin-bottom: 15px; 
+  }
   .logo_img{
     position: absolute;
     top: 3px;
     width: 122px;
     margin-left: 2px;
     margin-top: 20px;
+  }
+  .message-card{
+    p {
+      font-size: 12px;
+      color: #777777;
+      height: 13px;
+    }
+   
+  }
+  .item {
+    height: 24px;
+    line-height: 24px;
+  }
+  .message-down {
+    line-height: 24px;
   }
 .navbar {
   position:fixed;

@@ -9,7 +9,6 @@
         <el-breadcrumb-item v-for="(item)  in levelList" :key="item.path" v-if="item.meta.name">
           <span v-if="item.meta.clickAble != null && item.meta.clickAble==false">{{item.meta.name  }}</span>
           <router-link v-else  :to="item.redirect||item.path">当前位置：{{item.meta.name  }}</router-link>
-
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>

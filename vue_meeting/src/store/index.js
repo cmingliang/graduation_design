@@ -6,6 +6,7 @@ import permission from './modules/permission'
 import tagsView from './modules/tagsView'
 import user from './modules/user'
 import select from './modules/selectOption'
+import dashboard from './modules/dashboard'
 import getters from './getters'
 
 
@@ -18,7 +19,8 @@ const store = new Vuex.Store({
     permission,
     tagsView,
     user,
-    select
+    select,
+    dashboard
   },
   getters
 })
