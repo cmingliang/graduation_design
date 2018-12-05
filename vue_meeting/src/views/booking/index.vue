@@ -58,11 +58,39 @@
                 :visible.sync="dialogVisible"
                 width="50%"
                 :before-close="handleClose">
-                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" >
                     <el-menu-item index="1">茶歇类</el-menu-item>
                     <el-menu-item index="2">饮品类</el-menu-item>
                     <el-menu-item index="3">果盘类</el-menu-item>
                 </el-menu>
+                <div style="display:flex">
+                    <div style="flex-grow:3;border:0px solid black">
+                        <div> 
+                        <el-table
+                        :data="tableData"
+                        >
+                        <el-table-column
+                            prop="name"
+                            label="名称"
+                            >
+                        </el-table-column>
+                        <el-table-column
+                            prop="price"
+                            label="价格"
+                            >
+                        </el-table-column>
+                        <el-table-column
+                            prop="number"
+                            label="数量">
+                        </el-table-column>
+                        </el-table>
+                        </div>
+                       
+                    </div>
+                    <div style="flex-grow:2;border:0px solid black">清单
+                        <p v-for="checkedService in checkedServices" :key="checkedService">
+                            {{checkedService.name}}×{{checkedService.number}}</p></div>
+                </div>
                 </el-dialog>
             </el-form-item>
             <el-form-item label="会议室设备">
@@ -96,7 +124,8 @@
           loop:false,
           equipments:["白板","投影仪"]
         },
-        dialogVisible:false
+        dialogVisible:false,
+        checkedServices:[],
       }
     },
     methods: {
