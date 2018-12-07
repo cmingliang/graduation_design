@@ -128,6 +128,7 @@ export const asyncRouterMap = [
     meta: { permission: ['u_app']  },
     children: [
       {
+        hidden: true,//不再菜单中显示
         path: 'index',
         component: () => import('@/views/application/index'),
         name: 'Application',
@@ -284,6 +285,12 @@ export const asyncRouterMap = [
         component: () => import('@/views/super/MeetingRoom'),
         name: 'MeetingRoom',
         meta: { name: '会议室管理', title: 'MeetingRoom', icon: 'user', noCache: true }
+      },
+      {
+        path: 'uesrPage',
+        component: () => import('@/views/super/user'),
+        name: 'uesrPage',
+        meta: { name: '用户管理', title: 'userPage', icon: 'user', noCache: true }
       }
 
     ]

@@ -51,30 +51,22 @@
           fullscreen
           class="addDialog">
           <el-form :model="form" label-position="left">
-          <el-form-item label="会议室名称" :label-width="formLabelWidth">
-            <el-input v-model="form.name" ></el-input>
+          <el-form-item label="会议室" :label-width="formLabelWidth">
+            <el-select v-model="form.meetingRoom" placeholder="请选择">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="客容量" :label-width="formLabelWidth">
-            <el-input v-model="form.capacity" ></el-input>        
+          <el-form-item label="设备名称" :label-width="formLabelWidth">
+            <el-input v-model="form.name" ></el-input>        
           </el-form-item>
-          <el-form-item label="地点" :label-width="formLabelWidth">
-            <el-input v-model="form.place" ></el-input>        
+          <el-form-item label="设备数量" :label-width="formLabelWidth">
+            <el-input v-model="form.number" ></el-input>        
           </el-form-item>
-          <el-form-item label="设备">
-             <el-checkbox-group v-model="form.equipments">
-            <el-checkbox label="白板"></el-checkbox>
-            <el-checkbox label="远程视频"></el-checkbox>
-            <el-checkbox label="投影仪"></el-checkbox>
-            <el-checkbox label="麦克风"></el-checkbox>
-          </el-checkbox-group>
-          </el-form-item>
-          <el-form-item label="类型">
-             <el-radio-group v-model="form.type">
-            <el-radio :label="1">小型</el-radio>
-            <el-radio :label="2">中型</el-radio>
-            <el-radio :label="3">大型</el-radio>
-            </el-radio-group>
-          </el-form-item>     
         </el-form>
         <div slot="footer" class="add-footer">
         <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
@@ -108,10 +100,22 @@
             },
             {
               meetingRoom:'第二会议室',
-              totalNumber:1,
+              totalNumber:3,
               equipment:'投影仪',
               number:2
-            }  
+            },
+            {
+              meetingRoom:'第二会议室',
+              totalNumber:3,
+              equipment:'投影仪',
+              number:2
+            },
+            {
+              meetingRoom:'第二会议室',
+              totalNumber:3,
+              equipment:'投影仪',
+              number:2
+            }    
            ],
           addDialogVisible:false,
           formLabelWidth: '100px', 
@@ -122,7 +126,24 @@
             equipments:[],
             type:1
           } ,
-          dialogTitle:'新增会议室'   
+          dialogTitle:'新增设备',
+          options: [{
+            value: '选项1',
+            label: '第一会议室'
+          }, {
+            value: '选项2',
+            label: '第二会议室'
+          }, {
+            value: '选项3',
+            label: '第三会议室'
+          }, {
+            value: '选项4',
+            label: '第四会议室'
+          }, {
+            value: '选项5',
+            label: '第五会议室'
+          }], 
+          
         }
       },
       // computed:{
@@ -138,26 +159,33 @@
         console.log(index, row);
       },
       handleChange1(){
-        this.dialogTitle="编辑会议室"
+        this.dialogTitle="编辑设备"
         this.addDialogVisible=true
       },
        handleChange2(){
-        this.dialogTitle="新增会议室"
+        this.dialogTitle="新增设备"
         this.addDialogVisible=true
       },
       arraySpanMethod({ row, column, rowIndex, columnIndex }) {
         if(columnIndex===0){
-          if (rowIndex % row.totalNumber === 0) {//合并多少行
+          if(rowIndex===0) {
+          this.prevMeetingRoom=row.meetingRoom;
             return {
               rowspan: row.totalNumber,  //要合并的行数
               colspan: 1
             };
-          } else {
+          }else if(row.meetingRoom!==this.prevMeetingRoom){
+          this.prevMeetingRoom=row.meetingRoom;
+             return {
+              rowspan: row.totalNumber,  //要合并的行数
+              colspan: 1
+            };
+          }else if(row.meetingRoom===this.prevMeetingRoom){
             return {
               rowspan: 0,
               colspan: 0
             };
-          }
+          }       
         }
            
       }

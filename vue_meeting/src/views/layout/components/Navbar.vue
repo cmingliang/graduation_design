@@ -2,7 +2,7 @@
   <div class="navbar">
     <div class="logo">
       <img class="logo_img" src="@/assets/logo@2x.png"/>
-      <span class="logo_text">阳光暖果授权证书管理系统</span>
+      <span class="logo_text">阳光暖果会议预约系统</span>
     </div>
     <div class="right-menu">
       <template v-if="device!=='mobile'">
@@ -14,12 +14,8 @@
         <!--<lang-select class="international right-menu-item"/>-->
       </template>
        
-      <el-dropdown class="avatar-container right-menu-item" trigger="click">           
-        <div class="avatar-wrapper">
-         <!--<span class="svg-container ">-->
-          <!--<svg-icon icon-class="user" />-->
-        <!--</span>-->
-          <!--<img src="@/assets/head1.jpg" class="user-avatar">-->
+                
+        
           <div class="message-wrapper">
           <el-dropdown class="message-down">
           <el-badge :value="messageNumber" class="item">
@@ -53,14 +49,20 @@
             </el-dropdown-item>
           </el-dropdown-menu>
           </el-dropdown>
-          </div>  
-          <img class="user-avatar" src="@/assets/bear.jpg" alt="bear">
-                 
+          </div> 
+         
+
+          <div class="avatar-wrapper">
+          <el-dropdown class="avatar-container right-menu-item" trigger="click"> 
+            <div  class="top-dropdown">
+               <img class="user-avatar" src="@/assets/bear.jpg" alt="bear">               
           <span class="user-name" style="color: #fff">
             {{userInfo.name}}
           </span>
-          <i class="el-icon-caret-bottom"/>
-        </div>
+           
+          <i class="el-icon-caret-bottom"/> 
+            </div>
+          
         <el-dropdown-menu slot="dropdown">
           <router-link to="/user/myinfo" v-if="hasPermission('u_myInfo')">
             <el-dropdown-item>
@@ -79,6 +81,7 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+       </div>
     </div>
   </div>
 </template>
@@ -201,6 +204,7 @@ export default {
     float: right;
     height: 100%;
     margin-right: 10px;
+    display: flex;
     &:focus{
      outline: none;
     }
@@ -217,11 +221,7 @@ export default {
     .theme-switch {
       vertical-align: 15px;
     }
-   
-    .avatar-container {
-      height: 100%;
-      margin-right: 15px;
-      .message-wrapper {
+    .message-wrapper {
         height: 100%;
         display: inline-block;
         margin-right: 30px;
@@ -231,15 +231,24 @@ export default {
         font-size: 24px;
         color: white;
         vertical-align: middle;
-      }
-      }
-      .avatar-wrapper {
+        }
+    }
+    .avatar-wrapper {
         cursor: pointer;
         height: 100%;
         position: relative;
         display: inline-block;  
         line-height:80px; 
-        .user-name {
+       
+       
+    }
+    
+  }
+  .top-dropdown {
+      height:40px;
+      line-height:50px;
+      vertical-align: middle;
+       .user-name {
           height: 100%;
           vertical-align: middle;
         }
@@ -254,9 +263,6 @@ export default {
           color: white;
           vertical-align: middle;
         }
-       
-      }
-    }
   }
 }
 </style>
