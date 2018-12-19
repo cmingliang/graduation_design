@@ -1,13 +1,8 @@
 <template>
   <el-scrollbar wrap-class="scrollbar-wrapper">
-    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
-    <el-menu
-      :show-timeout="200"
-      :default-active="$route.path"
-      :collapse="isCollapse"
-      mode="vertical"
-    >
-      <sidebar-item v-for="route in permission_routers" :key="route.name" :item="route" :base-path="route.path"/>
+    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container" />
+    <el-menu :show-timeout="200" :default-active="$route.path" :collapse="isCollapse" mode="vertical">
+      <sidebar-item v-for="route in permission_routers" :key="route.name" :item="route" :base-path="route.path" />
     </el-menu>
   </el-scrollbar>
 </template>
@@ -18,7 +13,7 @@ import SidebarItem from './SidebarItem'
 import Hamburger from '@/components/Hamburger'
 
 export default {
-  components: { SidebarItem,Hamburger },
+  components: { SidebarItem, Hamburger },
   computed: {
     ...mapGetters([
       'permission_routers',
@@ -36,18 +31,21 @@ export default {
     //   });
     // }
   },
-  methods:{
+  methods: {
     toggleSideBar() {
       this.$store.dispatch('toggleSideBar')
     }
+  },
+  mounted() {
+    console.log(this.permission_routers);
   }
 }
 </script>
 
 <style scoped>
-  .hamburger-container {
-    margin-left: 20px;
-  }
+.hamburger-container {
+  margin-left: 20px;
+}
 </style>
 
 

@@ -1,5 +1,5 @@
 import store from '@/store'
-import permission from "../store/modules/permission";
+import permission from '../store/modules/permission'
 
 /**
  * @param {Array} value
@@ -30,11 +30,15 @@ export default function checkPermission(value) {
  * @param value
  * @returns {boolean}
  */
-export  function hasPermission(value) {
+export function hasPermission(value) {
   if (value) {
-    const permissions = store.getters && store.getters.permissions;
+    const permissions = store.getters && store.getters.permissions
     const hasPermission = permissions.some(permission => {
-      return permission.authority.indexOf(value) >= 0;
+      try {
+        return permission.authority.indexOf(value) >= 0
+      } catch (error) {
+        return false
+      }
     })
 
     if (!hasPermission) {

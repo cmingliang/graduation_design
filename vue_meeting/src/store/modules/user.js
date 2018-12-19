@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 const user = {
   state: {
     userInfo: '',
-    permissions: []
+    permissions: ['a_customer', 'a_customer_all', 'u_app']
   },
 
   mutations: {
@@ -22,60 +22,75 @@ const user = {
     LoginByUsername({ commit }, userInfo) {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
-        loginByUsername(username, userInfo.password,userInfo.imageCode).then(response => {
-          const data = response.data;
-          let user = data.principal;
-          let permission = data.authorities;
-          // commit('SET_USER', user);
-          commit('SET_PERMISSIONS', permission);
-          Cookies.set("user",user);
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
+        loginByUsername(username, userInfo.password, userInfo.imageCode)
+          .then(response => {
+            const data = response.data
+            let user = data.principal
+            let permission = data.authorities
+            // commit('SET_USER', user);
+            commit('SET_PERMISSIONS', permission)
+            Cookies.set('user', user)
+            resolve()
+          })
+          .catch(error => {
+            reject(error)
+          })
       })
     },
 
     // 获取用户信息
-    GetUserInfo({ commit}) {
+    GetUserInfo({ commit }) {
       return new Promise((resolve, reject) => {
-        getUserInfo().then(response => {
-          if (!response.data) { // 由于mockjs 不支持自定义状态码只能这样hack
-            reject('error')
-          }
-          const data = response.data.data;
-          let user = data.principal;
-          let permission = data.authorities;
-          commit('SET_USER', user);
-          commit('SET_PERMISSIONS', permission);
+        // getUserInfo()
+        //   .then(response => {
+        //     if (!response.data) {
+        //       // 由于mockjs 不支持自定义状态码只能这样hack
+        //       reject('error')
+        //     }
+        //     const data = response.data.data
+        //     let user = data.principal
+        //     let permission = data.authorities
+        //     commit('SET_USER', user)
+        //     commit('SET_PERMISSIONS', permission)
 
-          resolve(response);
-        }).catch(error => {
-          reject(error)
-        })
+        //     resolve(response)
+        //   })
+        //   .catch(error => {
+        //     reject(error)
+        //   })
+        const data = {
+          principal: {},
+          authorities: ['a_customer', 'a_customer_all', 'u_app']
+        }
+        let user = data.principal
+        let permission = data.authorities
+        commit('SET_USER', user)
+        commit('SET_PERMISSIONS', permission)
+
+        resolve()
       })
     },
-
 
     // 登出
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
-        logout().then(() => {
-
-          Cookies.set("user","");
-          commit('SET_PERMISSIONS', []);
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
+        logout()
+          .then(() => {
+            Cookies.set('user', '')
+            commit('SET_PERMISSIONS', [])
+            resolve()
+          })
+          .catch(error => {
+            reject(error)
+          })
       })
     },
 
     // 前端 登出
     FedLogOut({ commit }) {
       return new Promise(resolve => {
-        Cookies.set("user","");
-        commit('SET_PERMISSIONS', []);
+        Cookies.set('user', '')
+        commit('SET_PERMISSIONS', [])
         removeToken()
         resolve()
       })
