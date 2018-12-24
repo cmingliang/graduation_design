@@ -22,3 +22,11 @@ export function deleteMeetingRoom(id) {
     data: { id }
   })
 }
+
+export function updateMeetingRoom(data) {
+  return request({
+    url: '/api/meetingRoom/update',
+    method: 'post',
+    data
+  })
+}

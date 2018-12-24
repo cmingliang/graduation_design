@@ -12,23 +12,23 @@
       </el-table-column>
       <el-table-column label="会议室状态" prop="roomIsOpen" align="center">
         <template slot-scope="scope">
-          <el-switch v-model="tableData[scope.$index].roomIsOpen" active-color="#3cafcc" inactive-color="#d0cfcf">
+          <el-switch v-model="tableData[scope.$index].roomIsOpen" active-color="#3cafcc" inactive-color="#d0cfcf" @change="handleOpen(scope.row)">
           </el-switch>
         </template>
       </el-table-column>
       <el-table-column label="自动审核" prop="auto" align="center">
         <template slot-scope="scope">
-          <el-switch v-model="tableData[scope.$index].roomIsOpen" active-color="#3cafcc" inactive-color="#d0cfcf">
+          <el-switch v-model="tableData[scope.$index].auto" active-color="#3cafcc" inactive-color="#d0cfcf" @change="handleAuto(scope.row)">
           </el-switch>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="scope">
           <div class="btn-wrapper">
-            <el-button type="primary" class="btn" style="background-color:#3cafcc;" @click="handleChange1">编辑</el-button>
+            <el-button type="primary" class="btn" style="background-color:#3cafcc;" @click="handleEditFirst(scope.row)">编辑</el-button>
             <el-button type="primary" class="btn" style="background-color:#f5856d;" @click="handleDeleteFirst(scope.row.roomId)">删除</el-button>
           </div>
-          <el-dialog :modal=false :title="dialogTitle" :visible.sync="addDialogVisible" fullscreen class="addDialog">
+          <el-dialog :modal=false title="新增会议室" :visible.sync="addDialogVisible" fullscreen class="addDialog">
             <el-form :model="form" label-position="left">
               <el-form-item label="会议室名称" :label-width="formLabelWidth">
                 <el-input v-model="form.roomName"></el-input>
@@ -66,13 +66,41 @@
         <el-button type="primary" @click="handleDelete()">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog :modal=false title="编辑会议室" :visible.sync="editDialogVisible" fullscreen class="addDialog">
+      <el-form :model="editForm" label-position="left">
+        <el-form-item label="会议室名称" :label-width="formLabelWidth">
+          <el-input v-model="editForm.roomName"></el-input>
+        </el-form-item>
+        <el-form-item label="客容量" :label-width="formLabelWidth">
+          <el-input v-model="editForm.capacity"></el-input>
+        </el-form-item>
+        <el-form-item label="地点" :label-width="formLabelWidth">
+          <el-input v-model="editForm.location"></el-input>
+        </el-form-item>
+        <!-- <el-form-item label="管理员" :label-width="formLabelWidth">
+                <el-input v-model="form.managerId"></el-input>
+              </el-form-item> -->
+        <el-form-item label="设备">
+          <el-checkbox-group v-model="editForm.equipments">
+            <el-checkbox label="白板"></el-checkbox>
+            <el-checkbox label="远程视频"></el-checkbox>
+            <el-checkbox label="投影仪"></el-checkbox>
+            <el-checkbox label="麦克风"></el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="add-footer">
+        <el-button type="primary" @click="handleEdit">确 定</el-button>
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
 
   </div>
 
 </template>
 
 <script>
-import { addMeetingRoom, getMeetingRoom, deleteMeetingRoom } from '@/api/meetingRoom';
+import { addMeetingRoom, getMeetingRoom, deleteMeetingRoom, updateMeetingRoom } from '@/api/meetingRoom';
 
 export default {
   data() {
@@ -80,6 +108,7 @@ export default {
       tableData: [],
       addDialogVisible: false,
       deleteDialogVisible: false,
+      editDialogVisible: false,
       formLabelWidth: '100px',
       form: {
         roomName: '',
@@ -88,7 +117,16 @@ export default {
         location: '',
         equipments: []
       },
-      dialogTitle: '新增会议室'
+      editForm: {
+        roomId: '',
+        roomName: '',
+        capacity: '',
+        managerId: 1,
+        location: '',
+        equipments: [],
+        auto: true,
+        roomIsOpen: true,
+      }
     }
   },
   // computed:{
@@ -97,8 +135,64 @@ export default {
   //   }
   // },
   methods: {
-    handleEdit(index, row) {
-      console.log(index, row);
+    handleOpen(row) {
+      updateMeetingRoom(row).then(
+        response => {
+          getMeetingRoom().then(
+            response => {
+              this.tableData = response.data            }
+          ).catch(
+            error => { console.log(error); }
+          )
+        }
+      ).catch(
+        error => { console.log(error); }
+      )
+    },
+    handleAuto(row) {
+      updateMeetingRoom(row).then(
+        response => {
+          getMeetingRoom().then(
+            response => {
+              this.tableData = response.data            }
+          ).catch(
+            error => { console.log(error); }
+          )
+        }
+      ).catch(
+        error => { console.log(error); }
+      )
+    },
+    handleEditFirst(row) {
+      console.log(row);
+      this.editForm.roomId = row.roomId
+      this.editForm.roomName = row.roomName
+      this.editForm.capacity = row.capacity
+      this.editForm.managerId = row.managerId
+      this.editForm.location = row.location
+      this.editForm.auto = row.auto
+      this.editForm.roomIsOpen = row.roomIsOpen
+      this.editForm.equipments = row.equipments.split(",")
+      this.editDialogVisible = true
+    },
+    handleEdit() {
+      updateMeetingRoom({ ...this.editForm, equipments: this.editForm.equipments.join(",") }).then(
+        response => {
+          this.$message({
+            message: '编辑成功',
+            type: 'success'
+          })
+          getMeetingRoom().then(
+            response => {
+              this.tableData = response.data            }
+          ).catch(
+            error => { console.log(error); }
+          )
+        }
+      ).catch(
+        error => { console.log(error); }
+      )
+      this.editDialogVisible = false
     },
     handleDelete() {
       deleteMeetingRoom(this.id).then(
