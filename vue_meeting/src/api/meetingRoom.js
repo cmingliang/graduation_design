@@ -10,7 +10,7 @@ export function addMeetingRoom(data) {
 
 export function getMeetingRoom() {
   return request({
-    url: '/api/meetingRoom/get',
+    url: '/api/meetingRoom/',
     method: 'get'
   })
 }

@@ -18,6 +18,8 @@
 
 </template>
 <script>
+import moment from 'moment'
+
 export default {
   name: 'MeetingRoomFilter',
   data() {
@@ -36,14 +38,14 @@ export default {
         label: '100'
       }],
       capacity: '',
-      dateValue: '',
-      checkedEquipment: ['白板'],
+      dateValue: this.$store.state.dashboard.date,
+      checkedEquipment: [''],
       equipments: ['白板', '远程视频', '投影', 'LED', '等离子']
     }
   },
   methods: {
     handleChange() {
-      this.$store.commit("CHANGE_DATE", this.dateValue)
+      this.$store.commit("CHANGE_DATE", moment(this.dateValue))
     }
   }
 }

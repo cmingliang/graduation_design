@@ -19,14 +19,14 @@
       </el-form-item>
       <el-form-item label="主持人">
         <el-button type="primary" @click="personDialogVisible = true">选择</el-button>
-        <span v-show="hostVisible" v-for="item in this.form.host" :key="item.id">{{item.label}}&nbsp;&nbsp;</span>
+        <span v-show="hostVisible" v-for="item in this.form.hosts" :key="item.id">{{item.label}}&nbsp;&nbsp;</span>
       </el-form-item>
       <el-form-item label="参与人">
         <el-button type="primary" @click="participantDialogVisible = true">选择</el-button>
-        <span v-show="participantVisible" v-for="item in this.form.participant" :key="item.id">{{item.label}}&nbsp;&nbsp;</span>
+        <span v-show="participantVisible" v-for="item in this.form.participants" :key="item.id">{{item.label}}&nbsp;&nbsp;</span>
       </el-form-item>
       <el-form-item label="会议说明">
-        <el-input type="textarea" v-model="form.desc"></el-input>
+        <el-input type="textarea" v-model="form.description"></el-input>
       </el-form-item>
       <el-form-item label="会议类型">
         <el-radio-group v-model="form.type">
@@ -121,8 +121,8 @@
           </div>
         </div>
         <div style="flex-grow:1;border:0px solid black">
-          <p>已选择：{{this.form.host.length}}人</p>
-          <p v-for="item in this.form.host" :key="item.id">{{item.label}}</p>
+          <p>已选择：{{this.form.hosts.length}}人</p>
+          <p v-for="item in this.form.hosts" :key="item.id">{{item.label}}</p>
         </div>
       </div>
       <div slot="footer" class="add-footer">
@@ -141,8 +141,8 @@
           </div>
         </div>
         <div style="flex-grow:1;border:0px solid black">
-          <p>已选择：{{this.form.participant.length}}人</p>
-          <p v-for="item in this.form.participant" :key="item.id">{{item.label}}</p>
+          <p>已选择：{{this.form.participants.length}}人</p>
+          <p v-for="item in this.form.participants" :key="item.id">{{item.label}}</p>
         </div>
       </div>
       <div slot="footer" class="add-footer">
@@ -155,24 +155,29 @@
 
 <script>
 import { getMeetingService } from '@/api/meetingService'
+import { addMeeting } from '@/api/meeting'
+import moment from 'moment'
 
 export default {
   data() {
     return {
       activeName: 'first',
       form: {
+        roomId: this.$store.state.dashboard.roomId,
         roomName: this.$store.state.dashboard.roomName,
-        timeRange: [new Date(this.$store.state.dashboard.date).setHours(this.$store.state.dashboard.time[0]),
-        new Date(this.$store.state.dashboard.date).setHours(this.$store.state.dashboard.time[1])],
+        timeRange: [this.$store.state.dashboard.date.hour(this.$store.state.dashboard.time[0]).toDate(),
+        this.$store.state.dashboard.date.hour(this.$store.state.dashboard.time[1]).toDate()],
         title: '',
-        host: '',
-        participant: '',
-        desc: '',
+        hosts: '1',
+        participants: [1, 2],
+        description: '',
         type: '',
         loop: false,
         service: '',
         equipments: this.$store.state.dashboard.equipments,
-        capacity: this.$store.state.dashboard.capacity
+        capacity: this.$store.state.dashboard.capacity,
+        createTime: new Date(),
+        createBy: 'Tom'
       },
       dialogVisible: false,
       personDialogVisible: false,
@@ -300,7 +305,20 @@ export default {
       this.form.participant = total.filter(item => (item.children === undefined))
     },
     onSubmit() {
-      console.log(this.form);
+      addMeeting({        ...this.form,
+        startTime: this.form.timeRange[0],
+        endTime: this.form.timeRange[1],
+        service: JSON.stringify(this.tableData)      }).then(
+        response => {
+          this.$message({
+            message: '预约成功',
+            type: 'success'
+          })
+          this.$router.push({ path: '/' })
+        }
+      ).catch(
+        error => { console.log(error); }
+      )
     },
     filterNode(value, data) {
       if (!value) return true;

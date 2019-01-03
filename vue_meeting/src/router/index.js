@@ -111,6 +111,17 @@ export const constantRouterMap = [
           icon: 'user',
           noCache: true
         }
+      },
+      {
+        path: 'test',
+        component: () => import('@/views/user/test'),
+        name: 'test',
+        meta: {
+          name: 'test',
+          title: 'test',
+          icon: 'user',
+          noCache: true
+        }
       }
     ]
   },

@@ -1,11 +1,14 @@
+import moment from 'moment'
+
 const dashboard = {
   state: {
     showState: '日',
     roomName: '',
     time: [],
-    date: '',
+    date: moment().startOf('day'),
     equipments: '',
-    capacity: ''
+    capacity: '',
+    roomId: ''
   },
 
   mutations: {
@@ -26,6 +29,9 @@ const dashboard = {
     },
     CHANGE_CAPACITY: (state, data) => {
       state.capacity = data
+    },
+    CHANGE_ROOMID: (state, data) => {
+      state.roomId = data
     }
   }
 }
