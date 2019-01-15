@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="meeting-table-wrapper" v-show="status.showState==='日'">
-      <el-table :data="tableData" border style="width: 100%" :cell-style="handleColor">
+      <el-table :data="tableData" border style="width: 100%">
         <el-table-column prop="roomName" label="会议室/时间" width="91" align="center" label-class-name='meeting-table-header'>
         </el-table-column>
         <el-table-column v-for="time in times" :label="time" :key="time" align="center" label-class-name='meeting-table-header' class-name="meeting-table-column">
@@ -90,7 +90,10 @@ export default {
   methods: {
     handleSource() {
       let a = {}
-      let d = this.source.filter(item => {
+      console.log(this.source);
+      let d = []
+      console.log(this.$store.state.dashboard.date);
+      d = this.source.filter(item => {
         if (moment(item.startTime).isAfter(this.$store.state.dashboard.date) && moment(item.startTime).isBefore(moment(this.$store.state.dashboard.date).add(1, 'days'))) {
           return true
         } else {
@@ -117,9 +120,9 @@ export default {
           })
         })
       })
+      console.log(a);
       getMeetingRoom().then(
         response => {
-          console.log(a);
           response.data.map(item => {
             if (a[item.roomName]) {
               return Object.assign(item, a[item.roomName])
@@ -128,18 +131,10 @@ export default {
             }
           })
           this.tableData = response.data
-          console.log(this.tableData);
+          console.log(response.data);
         }).catch(
           error => { console.log(error); }
         )
-    },
-    handleColor({ row, column, rowIndex, columnIndex }) {
-      if (row.roomName === '第一会议室' && columnIndex === 4) {
-        return 'background-color:blue'
-      }
-      else {
-        return ''
-      }
     },
     handleStyle(scope) {
       let a = scope.row[scope.column.label]
@@ -155,12 +150,9 @@ export default {
       }
     },
     handleEdit(row, col) {
-      console.log(row);
       col = col.split("-")
       col = col.map(item => parseInt(item))
-      console.log(this.$store.state.dashboard.date.format('DD'));
       this.$store.commit("CHANGE_ROOMNAME", row.roomName)
-      console.log(this.$store.state.dashboard.date.format('DD'));
       this.$store.commit("CHANGE_TIME", col)
       this.$store.commit("CHANGE_EQUIPMENTS", row.equipments)
       this.$store.commit("CHANGE_CAPACITY", row.capacity)
@@ -181,7 +173,7 @@ export default {
     }
   },
   mounted: function () {
-    console.log(333);
+    console.log(222);
     getMeeting().then(
       response => {
         this.source = response.data
@@ -190,14 +182,6 @@ export default {
     ).catch(
       error => { console.log(error); }
     )
-    let es = new EventSource('/api/es')
-    es.onmessage = function (event) {
-      this.listData = JSON.parse(event.data);
-      console.log(this.listData);
-    }
-    es.onerror = function (event) {
-      console.log(event);
-    }
     // Object.keys(a).forEach(key => { b = b.concat([Object.assign({}, a[key], { roomName: key })]) })
   }
 

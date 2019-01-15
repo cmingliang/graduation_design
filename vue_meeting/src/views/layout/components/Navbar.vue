@@ -16,35 +16,33 @@
       </template>
 
       <div class="message-wrapper">
-        <el-dropdown class="message-down">
+        <el-dropdown class="message-down" :hide-on-click="false">
           <el-badge :value="messageNumber" class="item">
             <i class="el-icon-bell" />
           </el-badge>
-          <el-dropdown-menu slot="dropdown">
+          <el-dropdown-menu slot="dropdown" class="noticedropdown">
             <el-dropdown-item>
               <div class="message-card" style="display:flex;justify-content:space-between">
                 会议信息
                 <span style="color:#777777;font-size:12px">忽略全部</span>
               </div>
             </el-dropdown-item>
-            <el-dropdown-item divided>
+            <el-dropdown-item divided v-for="list in listData" :key="list.id">
               <div class="message-card">
-                <p>张三邀请你参加会议：市场部会议</p>
-                <p>会议时间：2018-12-3 15：00-16：00</p>
-                <p>会议地点：第一会议室</p>
-                <p>请确认是否参加</p>
-                <el-button type="primary" class="message-btn" style="background-color: #3cafcc;">参加</el-button>
-                <el-button type="primary" class="message-btn" style="background-color: #f5856d;">请假</el-button>
-              </div>
-            </el-dropdown-item>
-            <el-dropdown-item divided>
-              <div class="message-card">
-                <p>张三邀请你参加会议：市场部会议</p>
-                <p>会议时间：2018-12-3 15：00-16：00</p>
-                <p>会议地点：第一会议室</p>
-                <p>请确认是否参加</p>
-                <el-button type="primary" class="message-btn" style="background-color: #3cafcc;">参加</el-button>
-                <el-button type="primary" class="message-btn" style="background-color: #f5856d;">请假</el-button>
+                <p>{{list.createBy}}邀请你参加会议：{{list.title}}</p>
+                <p>会议时间：{{list.startTime}}-{{list.endTime}}</p>
+                <p>会议地点：{{list.roomName}}</p>
+                <div v-if='userState[list.id]===0'>
+                  <p>请确认是否参加</p>
+                  <el-button type="primary" class="message-btn" style="background-color: #3cafcc;" @click='handleJoin({state:1,meetingId:list.id})'>参加</el-button>
+                  <el-button type="primary" class="message-btn" style="background-color: #f5856d;" @click='handleJoin({state:2,meetingId:list.id})'>请假</el-button>
+                </div>
+                <div v-else-if='userState[list.id]===1'>
+                  <el-button type="primary" class="message-btn" style="background-color: #3cafcc;" disabled>已参加</el-button>
+                </div>
+                <div v-else-if='userState[list.id]===2'>
+                  <el-button type="primary" class="message-btn" style="background-color: #f5856d;" disabled>已请假</el-button>
+                </div>
               </div>
             </el-dropdown-item>
           </el-dropdown-menu>
@@ -61,7 +59,6 @@
 
             <i class="el-icon-caret-bottom" />
           </div>
-
           <el-dropdown-menu slot="dropdown">
             <router-link to="/user/myinfo" v-if="hasPermission('u_myInfo')">
               <el-dropdown-item>
@@ -93,6 +90,8 @@ import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import LangSelect from '@/components/LangSelect'
 import { hasPermission } from '@/utils/permission' // 权限判断函数
+import moment from 'moment'
+import { joinMeeting, getUserState } from '@/api/navbar'
 
 
 export default {
@@ -106,7 +105,8 @@ export default {
   data() {
     return {
       messageNumber: 2,
-      listData: []
+      listData: [],
+      userState: ''
     }
   },
   computed: {
@@ -119,6 +119,23 @@ export default {
   },
   methods: {
     hasPermission,
+    handleJoin(data) {
+      joinMeeting(data).then(
+        response => {
+          getUserState().then(
+            response => {
+              this.userState = response.data
+            }
+          ).catch(
+            error => {
+              console.log(error);
+            }
+          )
+        }
+      ).catch(
+        error => { console.log(error); }
+      )
+    },
     toggleSideBar() {
       this.$store.dispatch('toggleSideBar')
     },
@@ -129,6 +146,36 @@ export default {
     }
   },
   mounted: function () {
+    let es = new EventSource('/api/es')
+    es.onmessage = event => {
+      let a = JSON.parse(event.data);
+      a = a.filter(item => {
+        if (item.state === 1) {
+          return true
+        } else {
+          return false
+        }
+      })
+      a.map(item => {
+        let b = []
+        item.startTime = moment(item.startTime.time).format('YYYY-MM-D HH:mm')
+        item.endTime = moment(item.endTime.time).format('YYYY-MM-D HH:mm')
+        item.rooms.forEach(element => { b = b.concat(element.roomName) });
+        item.roomName = b.join(',')
+        return item
+      })
+      this.listData = a
+    }
+    getUserState().then(
+      response => {
+        this.userState = response.data
+        console.log(response.data);
+      }
+    ).catch(
+      error => {
+        console.log(error);
+      }
+    )
 
   }
 
@@ -161,6 +208,10 @@ export default {
 .item {
   height: 24px;
   line-height: 24px;
+}
+.noticedropdown {
+  max-height: 400px;
+  overflow: scroll;
 }
 .message-down {
   line-height: 24px;

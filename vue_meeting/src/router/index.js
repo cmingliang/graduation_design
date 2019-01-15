@@ -111,18 +111,18 @@ export const constantRouterMap = [
           icon: 'user',
           noCache: true
         }
-      },
-      {
-        path: 'test',
-        component: () => import('@/views/user/test'),
-        name: 'test',
-        meta: {
-          name: 'test',
-          title: 'test',
-          icon: 'user',
-          noCache: true
-        }
       }
+      // {
+      //   path: 'test',
+      //   component: () => import('@/views/user/test'),
+      //   name: 'test',
+      //   meta: {
+      //     name: 'test',
+      //     title: 'test',
+      //     icon: 'user',
+      //     noCache: true
+      //   }
+      // }
     ]
   },
   // {
@@ -186,6 +186,7 @@ export const constantRouterMap = [
       {
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
+        hidden: true,
         name: 'Dashboard',
         meta: {
           name: '工作台',

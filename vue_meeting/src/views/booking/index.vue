@@ -165,8 +165,8 @@ export default {
       form: {
         roomId: this.$store.state.dashboard.roomId,
         roomName: this.$store.state.dashboard.roomName,
-        timeRange: [this.$store.state.dashboard.date.hour(this.$store.state.dashboard.time[0]).toDate(),
-        this.$store.state.dashboard.date.hour(this.$store.state.dashboard.time[1]).toDate()],
+        timeRange: [moment(this.$store.state.dashboard.date).hour(this.$store.state.dashboard.time[0]).toDate(),
+        moment(this.$store.state.dashboard.date).hour(this.$store.state.dashboard.time[1]).toDate()],
         title: '',
         hosts: '1',
         participants: [1, 2],
@@ -177,7 +177,6 @@ export default {
         equipments: this.$store.state.dashboard.equipments,
         capacity: this.$store.state.dashboard.capacity,
         createTime: new Date(),
-        createBy: 'Tom'
       },
       dialogVisible: false,
       personDialogVisible: false,
@@ -314,7 +313,8 @@ export default {
             message: '预约成功',
             type: 'success'
           })
-          this.$router.push({ path: '/' })
+          this.$router.go(-1)
+          //this.$router.push({ path: '/' })
         }
       ).catch(
         error => { console.log(error); }
