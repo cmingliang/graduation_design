@@ -17,7 +17,7 @@
 
       <div class="message-wrapper">
         <el-dropdown class="message-down" :hide-on-click="false">
-          <el-badge :value="messageNumber" class="item">
+          <el-badge :value="messageNumber" class="item" :hidden="messageNumber===0">
             <i class="el-icon-bell" />
           </el-badge>
           <el-dropdown-menu slot="dropdown" class="noticedropdown">
@@ -29,7 +29,7 @@
             </el-dropdown-item>
             <el-dropdown-item divided v-for="list in listData" :key="list.id">
               <div class="message-card">
-                <p>{{list.createBy}}邀请你参加会议：{{list.title}}</p>
+                <p>{{list.createBy.name}}邀请你参加会议：{{list.title}}</p>
                 <p>会议时间：{{list.startTime}}-{{list.endTime}}</p>
                 <p>会议地点：{{list.roomName}}</p>
                 <div v-if='userState[list.id]===0'>
@@ -115,7 +115,10 @@ export default {
       'name',
       'avatar',
       'device'
-    ])
+    ]),
+    listLength() {
+      return listData.length
+    }
   },
   methods: {
     hasPermission,
@@ -164,12 +167,12 @@ export default {
         item.roomName = b.join(',')
         return item
       })
+      a.reverse()
       this.listData = a
     }
     getUserState().then(
       response => {
         this.userState = response.data
-        console.log(response.data);
       }
     ).catch(
       error => {

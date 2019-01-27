@@ -1,34 +1,30 @@
 <template>
   <div class="form-wrapper">
-    <el-form ref="form" :model="form" label-width="100px">
-      <el-form-item label="会议室">
+    <el-form ref="form" :model="form" label-width="100px" :rules="rules">
+      <el-form-item label="会议室" prop="roomName">
         <el-select v-model="form.roomName" placeholder="请选择会议室">
-          <el-option label="第一会议室" value="one"></el-option>
-          <el-option label="第二会议室" value="two"></el-option>
-          <el-option label="第三会议室" value="three"></el-option>
-          <el-option label="第四会议室" value="four"></el-option>
-          <el-option label="第五会议室" value="five"></el-option>
+          <el-option v-for="room in rooms" :key="room.id" :label="room.roomName" :value="room.roomName"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="会议时间">
+      <el-form-item label="会议时间" prop="timeRange">
         <el-time-picker is-range v-model="form.timeRange" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间">
         </el-time-picker>
       </el-form-item>
-      <el-form-item label="会议主题">
+      <el-form-item label="会议主题" prop="title">
         <el-input v-model="form.title"></el-input>
       </el-form-item>
-      <el-form-item label="主持人">
+      <el-form-item label="主持人" prop="hostId">
         <el-button type="primary" @click="personDialogVisible = true">选择</el-button>
-        <span v-show="hostVisible" v-for="item in this.form.hosts" :key="item.id">{{item.label}}&nbsp;&nbsp;</span>
+        <span v-show="hostVisible" v-for="item in this.form.hostId" :key="item.id">{{item.label}}&nbsp;&nbsp;</span>
       </el-form-item>
-      <el-form-item label="参与人">
+      <el-form-item label="参与人" prop="participants">
         <el-button type="primary" @click="participantDialogVisible = true">选择</el-button>
         <span v-show="participantVisible" v-for="item in this.form.participants" :key="item.id">{{item.label}}&nbsp;&nbsp;</span>
       </el-form-item>
-      <el-form-item label="会议说明">
+      <el-form-item label="会议说明" prop="description">
         <el-input type="textarea" v-model="form.description"></el-input>
       </el-form-item>
-      <el-form-item label="会议类型">
+      <el-form-item label="会议类型" prop="type">
         <el-radio-group v-model="form.type">
           <el-radio label="内部使用"></el-radio>
           <el-radio label="外部使用"></el-radio>
@@ -110,19 +106,19 @@
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
-    <el-dialog title="参会人员" :visible.sync="personDialogVisible" width="50%" center>
+    <el-dialog title="主持人员" :visible.sync="personDialogVisible" width="50%" center>
       <div style="display:flex">
         <div style="flex-grow:1;border:0px solid black">
           <div>
             <el-input placeholder="输入关键字进行搜索" v-model="filterText" prefix-icon="el-icon-search" style="width:240px">
             </el-input>
-            <el-tree :data="data2" show-checkbox node-key="id" ref="tree2" :filter-node-method="filterNode" @check-change="getCheckedNodes">
+            <el-tree :data="hostData" show-checkbox node-key="id" ref="tree2" :filter-node-method="filterNode" @check-change="getCheckedNodes">
             </el-tree>
           </div>
         </div>
         <div style="flex-grow:1;border:0px solid black">
-          <p>已选择：{{this.form.hosts.length}}人</p>
-          <p v-for="item in this.form.hosts" :key="item.id">{{item.label}}</p>
+          <p>已选择：{{this.form.hostId.length}}人</p>
+          <p v-for="item in this.form.hostId" :key="item.id">{{item.label}}</p>
         </div>
       </div>
       <div slot="footer" class="add-footer">
@@ -136,7 +132,7 @@
           <div>
             <el-input placeholder="输入关键字进行搜索" v-model="participantText" prefix-icon="el-icon-search" style="width:240px">
             </el-input>
-            <el-tree :data="data3" show-checkbox node-key="id" ref="tree3" :filter-node-method="filterNode" @check-change="getParticipantNodes">
+            <el-tree :data="joinData" show-checkbox node-key="id" ref="tree3" :filter-node-method="filterNode" @check-change="getParticipantNodes">
             </el-tree>
           </div>
         </div>
@@ -157,9 +153,19 @@
 import { getMeetingService } from '@/api/meetingService'
 import { addMeeting } from '@/api/meeting'
 import moment from 'moment'
+import { getUser, getMeetingRoom } from '@/api/meetingRoom'
 
 export default {
   data() {
+    var validateHost = (rule, value, callback) => {
+      if (value.length === 0) {
+        callback(new Error('请选择一位主持人'));
+      } else if (value.length > 1) {
+        callback(new Error('只能选择一位主持人'));
+      } else {
+        callback()
+      }
+    };
     return {
       activeName: 'first',
       form: {
@@ -168,8 +174,8 @@ export default {
         timeRange: [moment(this.$store.state.dashboard.date).hour(this.$store.state.dashboard.time[0]).toDate(),
         moment(this.$store.state.dashboard.date).hour(this.$store.state.dashboard.time[1]).toDate()],
         title: '',
-        hosts: '1',
-        participants: [1, 2],
+        hostId: '',
+        participants: '',
         description: '',
         type: '',
         loop: false,
@@ -177,6 +183,29 @@ export default {
         equipments: this.$store.state.dashboard.equipments,
         capacity: this.$store.state.dashboard.capacity,
         createTime: new Date(),
+      },
+      rules: {
+        roomName: [
+          { required: true, message: '请输入会议室名称', trigger: 'blur' },
+        ],
+        timeRange: [
+          { required: true, message: '请选择会议时间', trigger: 'change' }
+        ],
+        title: [
+          { required: true, message: '请输入会议标题', trigger: 'blur' }
+        ],
+        hostId: [
+          { required: true, validator: validateHost, trigger: 'change' }
+        ],
+        participants: [
+          { type: 'array', required: true, message: '请至少选择一个参会人员', trigger: 'change' }
+        ],
+        type: [
+          { required: true, message: '请选择会议类型', trigger: 'change' }
+        ],
+        description: [
+          { required: true, message: '请填写会议说明', trigger: 'blur' }
+        ]
       },
       dialogVisible: false,
       personDialogVisible: false,
@@ -187,63 +216,13 @@ export default {
       tableData: [],
       filterText: '',
       participantText: '',
-      data2: [{
-        id: 1,
-        label: '市场部',
-        children: [{
-          id: 4,
-          label: '张三',
-        }]
-      }, {
-        id: 2,
-        label: '运营部',
-        children: [{
-          id: 5,
-          label: '李四'
-        }]
-      }, {
-        id: 3,
-        label: '销售部',
-        children: [{
-          id: 6,
-          label: '小李'
-        },
-        {
-          id: 7,
-          label: '王五'
-        }]
-      }],
-      data3: [{
-        id: 1,
-        label: '市场部',
-        children: [{
-          id: 4,
-          label: '张三',
-        }]
-      }, {
-        id: 2,
-        label: '运营部',
-        children: [{
-          id: 5,
-          label: '李四'
-        }]
-      }, {
-        id: 3,
-        label: '销售部',
-        children: [{
-          id: 6,
-          label: '小李'
-        },
-        {
-          id: 7,
-          label: '王五'
-        }]
-      }],
+      hostData: '',
+      joinData: '',
       defaultProps: {
         children: 'children',
         label: 'label'
       },
-
+      rooms: ''
     }
   },
   watch: {
@@ -252,6 +231,11 @@ export default {
     },
     participantText(val) {
       this.$refs.tree3.filter(val);
+    },
+    hostLength() {
+      if (this.hostLength > 1) {
+        this.$message.warning("只能选择一位主持人,多选则只选第一位为主持人")
+      }
     }
   },
   computed: {
@@ -266,6 +250,9 @@ export default {
     },
     totalPrice: function () {
       return this.tableData.reduce((total, item) => { return total + (item.number !== undefined ? item.number * item.price : 0) }, 0)
+    },
+    hostLength: function () {
+      return this.form.hostId.length
     }
   },
   methods: {
@@ -297,17 +284,19 @@ export default {
     },
     getCheckedNodes() {
       let total = this.$refs.tree2.getCheckedNodes();
-      this.form.host = total.filter(item => (item.children === undefined))
+      this.form.hostId = total.filter(item => (item.children === undefined))
     },
     getParticipantNodes() {
       let total = this.$refs.tree3.getCheckedNodes();
-      this.form.participant = total.filter(item => (item.children === undefined))
+      this.form.participants = total.filter(item => (item.children === undefined))
     },
     onSubmit() {
       addMeeting({        ...this.form,
         startTime: this.form.timeRange[0],
         endTime: this.form.timeRange[1],
-        service: JSON.stringify(this.tableData)      }).then(
+        service: JSON.stringify(this.tableData),
+        hostId: this.form.hostId[0].id,
+        participants: this.form.participants.map(item => (item.id))      }).then(
         response => {
           this.$message({
             message: '预约成功',
@@ -326,7 +315,39 @@ export default {
     }
   },
   mounted: function () {
-
+    getMeetingRoom().then(
+      response => {
+        this.rooms = response.data
+        console.log(this.rooms);
+      }
+    ).catch(
+      error => { console.log(error); }
+    )
+    getUser().then(
+      response => {
+        let a = {}
+        response.data.forEach(
+          item => {
+            if (a[item.department]) {
+              a[item.department] = a[item.department].concat({ id: item.id, label: item.name })
+            } else {
+              a[item.department] = [{ id: item.id, label: item.name }]
+            }
+          }
+        )
+        let b = []
+        let c = 1
+        Object.keys(a).forEach(
+          item => {
+            b = b.concat({ id: c++, label: item, children: a[item] })
+          }
+        )
+        this.joinData = b;
+        this.hostData = b;
+      }
+    ).catch(
+      error => { console.log(error); }
+    )
   }
 }
 </script>

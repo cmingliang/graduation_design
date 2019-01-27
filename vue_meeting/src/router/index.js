@@ -36,6 +36,7 @@ export const constantRouterMap = [
 
       {
         path: 'myinfo',
+        hidden: true,
         component: () => import('@/views/user/MyInfo'),
         name: 'MyInfo',
         meta: { name: '我的资料', title: 'MyInfo', icon: 'user', noCache: true }
@@ -47,7 +48,7 @@ export const constantRouterMap = [
         meta: {
           name: '我预约的',
           title: 'MyBooking',
-          icon: 'user',
+          icon: 'booking',
           noCache: true
         }
       },
@@ -55,7 +56,7 @@ export const constantRouterMap = [
         path: 'myjoin',
         component: () => import('@/views/user/MyJoin'),
         name: 'MyJoin',
-        meta: { name: '我参与的', title: 'MyJoin', icon: 'user', noCache: true }
+        meta: { name: '我参与的', title: 'MyJoin', icon: 'join', noCache: true }
       },
       {
         path: 'checkmeeting',
@@ -64,7 +65,7 @@ export const constantRouterMap = [
         meta: {
           name: '会议审核',
           title: 'CheckMeeting',
-          icon: 'user',
+          icon: 'check',
           noCache: true
         }
       },
@@ -75,7 +76,7 @@ export const constantRouterMap = [
         meta: {
           name: '设备管理',
           title: 'EquipmentManagement',
-          icon: 'user',
+          icon: 'equipment',
           noCache: true
         }
       },
@@ -86,7 +87,7 @@ export const constantRouterMap = [
         meta: {
           name: '服务管理',
           title: 'ServiceManagement',
-          icon: 'user',
+          icon: 'service',
           noCache: true
         }
       },
@@ -97,12 +98,13 @@ export const constantRouterMap = [
         meta: {
           name: '会议室管理',
           title: 'MeetingRoom',
-          icon: 'user',
+          icon: 'room',
           noCache: true
         }
       },
       {
         path: 'uesrPage',
+        // hidden: true,
         component: () => import('@/views/super/user'),
         name: 'uesrPage',
         meta: {

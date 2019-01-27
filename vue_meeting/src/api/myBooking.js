@@ -6,3 +6,11 @@ export function getBooking() {
     method: 'get'
   })
 }
+
+export function deleteBooking(id) {
+  return request({
+    url: '/api/mybooking',
+    method: 'post',
+    data: { id }
+  })
+}

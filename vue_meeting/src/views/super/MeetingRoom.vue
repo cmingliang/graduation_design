@@ -10,6 +10,8 @@
       </el-table-column>
       <el-table-column label="地点" prop="location" align="center">
       </el-table-column>
+      <el-table-column label="负责人" prop="manager.name" align="center">
+      </el-table-column>
       <el-table-column label="会议室状态" prop="roomIsOpen" align="center">
         <template slot-scope="scope">
           <el-switch v-model="tableData[scope.$index].roomIsOpen" active-color="#3cafcc" inactive-color="#d0cfcf" @change="handleOpen(scope.row)">
@@ -26,22 +28,25 @@
         <template slot-scope="scope">
           <div class="btn-wrapper">
             <el-button type="primary" class="btn" style="background-color:#3cafcc;" @click="handleEditFirst(scope.row)">编辑</el-button>
-            <el-button type="primary" class="btn" style="background-color:#f5856d;" @click="handleDeleteFirst(scope.row.roomId)">删除</el-button>
+            <el-button type="primary" class="btn" style="background-color:#f5856d;" @click="handleDeleteFirst(scope.row.id)">删除</el-button>
           </div>
           <el-dialog :modal=false title="新增会议室" :visible.sync="addDialogVisible" fullscreen class="addDialog">
-            <el-form :model="form" label-position="left">
-              <el-form-item label="会议室名称" :label-width="formLabelWidth">
+            <el-form :model="form" label-position="left" :rules="rules">
+              <el-form-item label="会议室名称" :label-width="formLabelWidth" prop="roomName">
                 <el-input v-model="form.roomName"></el-input>
               </el-form-item>
-              <el-form-item label="客容量" :label-width="formLabelWidth">
-                <el-input v-model="form.capacity"></el-input>
+              <el-form-item label="客容量" :label-width="formLabelWidth" prop="capacity">
+                <el-input v-model.number="form.capacity"></el-input>
               </el-form-item>
-              <el-form-item label="地点" :label-width="formLabelWidth">
+              <el-form-item label="地点" :label-width="formLabelWidth" prop="location">
                 <el-input v-model="form.location"></el-input>
               </el-form-item>
-              <!-- <el-form-item label="管理员" :label-width="formLabelWidth">
-                <el-input v-model="form.managerId"></el-input>
-              </el-form-item> -->
+              <el-form-item label="管理员" :label-width="formLabelWidth" prop="manager">
+                <el-select v-model="form.manager" filterable placeholder="请选择" style="width:232px">
+                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-form-item>
               <el-form-item label="设备">
                 <el-checkbox-group v-model="form.equipments">
                   <el-checkbox label="白板"></el-checkbox>
@@ -72,14 +77,17 @@
           <el-input v-model="editForm.roomName"></el-input>
         </el-form-item>
         <el-form-item label="客容量" :label-width="formLabelWidth">
-          <el-input v-model="editForm.capacity"></el-input>
+          <el-input v-model.number="editForm.capacity"></el-input>
         </el-form-item>
         <el-form-item label="地点" :label-width="formLabelWidth">
           <el-input v-model="editForm.location"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="管理员" :label-width="formLabelWidth">
-                <el-input v-model="form.managerId"></el-input>
-              </el-form-item> -->
+        <el-form-item label="管理员" :label-width="formLabelWidth">
+          <el-select v-model="editForm.manager" filterable placeholder="请选择" style="width:232px">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="设备">
           <el-checkbox-group v-model="editForm.equipments">
             <el-checkbox label="白板"></el-checkbox>
@@ -100,7 +108,7 @@
 </template>
 
 <script>
-import { addMeetingRoom, getMeetingRoom, deleteMeetingRoom, updateMeetingRoom } from '@/api/meetingRoom';
+import { addMeetingRoom, getMeetingRoom, deleteMeetingRoom, updateMeetingRoom, getUser } from '@/api/meetingRoom';
 
 export default {
   data() {
@@ -113,19 +121,35 @@ export default {
       form: {
         roomName: '',
         capacity: '',
-        managerId: 1,
+        manager: '',
         location: '',
         equipments: []
       },
       editForm: {
-        roomId: '',
+        id: '',
         roomName: '',
         capacity: '',
-        managerId: 1,
+        manager: '',
         location: '',
         equipments: [],
         auto: true,
         roomIsOpen: true,
+      },
+      options: '',
+      rules: {
+        roomName: [
+          { required: true, message: '请输入会议室名称', trigger: 'blur' },
+        ],
+        capacity: [
+          { required: true, message: '请输入课容量', trigger: 'blur' },
+          { type: 'number', message: '年龄必须为数字值' }
+        ],
+        manager: [
+          { required: true, message: '请选择会议室负责人', trigger: 'change' },
+        ],
+        location: [
+          { required: true, message: '请输入会议室地址', trigger: 'blur' },
+        ]
       }
     }
   },
@@ -164,19 +188,18 @@ export default {
       )
     },
     handleEditFirst(row) {
-      console.log(row);
-      this.editForm.roomId = row.roomId
+      this.editForm.id = row.id
       this.editForm.roomName = row.roomName
       this.editForm.capacity = row.capacity
-      this.editForm.managerId = row.managerId
+      this.editForm.manager = row.manager.name
       this.editForm.location = row.location
       this.editForm.auto = row.auto
       this.editForm.roomIsOpen = row.roomIsOpen
-      this.editForm.equipments = row.equipments.split(",")
+      this.editForm.equipments = row.equipments === null ? [] : row.equipments.split(',')
       this.editDialogVisible = true
     },
     handleEdit() {
-      updateMeetingRoom({ ...this.editForm, equipments: this.editForm.equipments.join(",") }).then(
+      updateMeetingRoom({ ...this.editForm, equipments: this.editForm.equipments.join(","), manager: this.users.find(item => { return item.id = this.editForm.manager }) }).then(
         response => {
           this.$message({
             message: '编辑成功',
@@ -209,7 +232,12 @@ export default {
           )
         }
       ).catch(
-        error => { console.log(error); }
+        error => {
+          this.$message.error({
+            message: '此会议室还有预约的会议，无法删除',
+            duration: 5000
+          })
+        }
       )
       this.deleteDialogVisible = false
     },
@@ -226,7 +254,7 @@ export default {
       this.addDialogVisible = true
     },
     handleAdd() {
-      addMeetingRoom({ ...this.form, equipments: this.form.equipments.join(",") }).then(
+      addMeetingRoom({ ...this.form, equipments: this.form.equipments.join(","), manager: this.users.find(item => { return item.id = this.form.manager }) }).then(
         response => {
           this.$message({
             message: '添加成功',
@@ -246,6 +274,21 @@ export default {
     }
   },
   mounted: function () {
+    getUser().then(
+      response => {
+        this.users = response.data
+        this.options = response.data.map(
+          item => {
+            let b = {}
+            b.label = item.name
+            b.value = item.id
+            return b
+          }
+        )
+      }
+    ).catch(
+      error => { console.log(error); }
+    )
     getMeetingRoom().then(
       response => {
         this.tableData = response.data      }

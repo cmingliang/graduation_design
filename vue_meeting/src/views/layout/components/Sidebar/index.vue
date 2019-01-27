@@ -1,10 +1,12 @@
 <template>
-  <el-scrollbar wrap-class="scrollbar-wrapper">
+  <!-- <el-scrollbar wrap-class="scrollbar-wrapper"> -->
+  <div>
     <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container" />
     <el-menu :show-timeout="200" :default-active="$route.path" :collapse="isCollapse" mode="vertical">
       <sidebar-item v-for="route in permission_routers" :key="route.name" :item="route" :base-path="route.path" />
     </el-menu>
-  </el-scrollbar>
+  </div>
+  <!-- </el-scrollbar> -->
 </template>
 
 <script>
@@ -37,14 +39,15 @@ export default {
     }
   },
   mounted() {
-    console.log(this.permission_routers);
+    //console.log(this.permission_routers);
   }
 }
 </script>
 
 <style scoped>
 .hamburger-container {
-  margin-left: 20px;
+  margin-left: 17px;
+  margin-top: 7px;
 }
 </style>
 

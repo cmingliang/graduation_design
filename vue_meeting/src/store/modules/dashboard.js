@@ -8,7 +8,12 @@ const dashboard = {
     date: moment().startOf('day'),
     equipments: '',
     capacity: '',
-    roomId: ''
+    roomId: '',
+    roomFilter: {
+      capacity: '',
+      name: '',
+      equipments: []
+    }
   },
 
   mutations: {
@@ -32,6 +37,9 @@ const dashboard = {
     },
     CHANGE_ROOMID: (state, data) => {
       state.roomId = data
+    },
+    CHANGE_ROOMFILTER: (state, data) => {
+      state.roomFilter = Object.assign({}, state.roomFilter, data)
     }
   }
 }

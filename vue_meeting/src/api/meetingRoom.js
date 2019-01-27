@@ -30,3 +30,10 @@ export function updateMeetingRoom(data) {
     data
   })
 }
+
+export function getUser() {
+  return request({
+    url: '/api/meetingRoom/user',
+    method: 'get'
+  })
+}

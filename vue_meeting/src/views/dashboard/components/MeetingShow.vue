@@ -7,7 +7,7 @@
       <el-radio-button label="月"></el-radio-button>
     </el-radio-group>
     <div>
-      <el-input placeholder="请输入会议室名称" prefix-icon="el-icon-search" v-model="meetingInput" class="meeting-input">
+      <el-input placeholder="请输入会议室名称" prefix-icon="el-icon-search" v-model="meetingInput" class="meeting-input" @change="handleName">
       </el-input>
     </div>
 
@@ -25,6 +25,9 @@ export default {
   methods: {
     handlechange() {
       this.$store.commit('CHANGE_SHOWSTATE', this.radio)
+    },
+    handleName() {
+      this.$store.commit('CHANGE_ROOMFILTER', { name: this.meetingInput })
     }
   }
 }
